@@ -14,27 +14,30 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::group([
+    'middleware' => 'auth:api'
+], function() {
 
-Route::get('/api/home/{idU}', 'matchesController@listmatches');
+    Route::get('/api/home/{idU}', 'matchesController@listmatches');
 
-Route::get('/api/partecipa', 'matchesController@partecipazione');
+    Route::get('/api/partecipa', 'matchesController@partecipazione');
 
-Route::get('/api/matchD/{id}/{idG}', 'matchesController@matchDetails');
+    Route::get('/api/matchD/{id}/{idG}', 'matchesController@matchDetails');
 
-Route::get('/api/aggiunta/{idG}/{idP}', 'matchesController@partecipa');
+    Route::get('/api/aggiunta/{idG}/{idP}', 'matchesController@partecipa');
 
-Route::get('/api/miepartite/{id}', 'matchesController@my_Matches');
+    Route::get('/api/miepartite/{id}', 'matchesController@my_Matches');
 
-Route::get('/api/terminated/{id}', 'matchesController@partite_terminate');
+    Route::get('/api/terminated/{id}', 'matchesController@partite_terminate');
 
-Route::get('/api/players/{id}/{idU}', 'ButtonsController@lasciaFeedback');
+    Route::get('/api/players/{id}/{idU}', 'ButtonsController@lasciaFeedback');
 
-Route::post('/api/updateProfile/{id}', 'ProfileController@updateProfile');
+    Route::post('/api/updateProfile/{id}', 'ProfileController@updateProfile');
 
-Route::post('/api/deletePart', 'ButtonsController@removePartecipation');
+    Route::post('/api/deletePart', 'ButtonsController@removePartecipation');
 
-Route::post('/api/delete', 'ButtonsController@Cancella');
+    Route::post('/api/delete', 'ButtonsController@Cancella');
 
 
-Route::post('/api/newM/{id}', 'matchesController@addMatch');
-
+    Route::post('/api/newM/{id}', 'matchesController@addMatch');
+});
