@@ -65,8 +65,8 @@ class matchesController extends Controller
                 'giocatori_richiesti' => 'required|string',
                 'descrizione' => 'required|string',
                 'data_ora' => 'required|date',
-                'tipologia' => 'required|string',
-                'organizzatore' => 'string'
+               // 'tipologia' => 'required|string',
+                'organizzatore' => 'integer'
             ]);
 
             $match = new Match;
@@ -75,8 +75,8 @@ class matchesController extends Controller
             $match->numero_giocatori = $request->giocatori_richiesti;
             $match->descrizione = $request->descrizione;
             $match->data_ora = $request->data_ora;
-            $match->tipo = $request->tipologia;
-            $match->organizzatore = $request->organizzatore;
+           // $match->tipo = $request->tipologia;
+            $match->id_organizzatore = $request->organizzatore;
             $match->save();
 
             /*DB::table('users')
@@ -97,7 +97,7 @@ class matchesController extends Controller
 
 
         $utente= DB::table('match')
-            ->select('organizzatore')
+            ->select('id_organizzatore')
             ->orderByDesc('created_at')
             ->first();
 
