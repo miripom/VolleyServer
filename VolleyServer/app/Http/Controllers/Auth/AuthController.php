@@ -31,10 +31,12 @@ class AuthController extends Controller
             $token->expires_at = Carbon::now()->addWeeks(1);
         $token->save();
         return response(
-                ['nome'=>$user->nome,
-                'cognome'=>$user->cognome
+                ['nome' => $user->nome,
+                'cognome' => $user->cognome,
+                'id' => $user->id,
 
-                ], 200)->withHeaders(['token' => $tokenResult->token->id]);
+
+            ], 200)->withHeaders([ 'Access-Control-Expose-Headers' => 'token','token' => $tokenResult->token->id]);
     }
 
     public function register(Request $request)
@@ -48,11 +50,11 @@ class AuthController extends Controller
             'nome_ruolo' => 'required|string'
         ]);
 
-        $nome_ruolo= $request->input('nome_ruolo');
+        $nome_ruolo = $request->input('nome_ruolo');
 
         $ruolo = DB::table('role_type')
             ->select('id')
-            ->where('nome_ruolo' ,'=', $nome_ruolo)
+            ->where('nome_ruolo', '=', $nome_ruolo)
             ->value('id');
 
 

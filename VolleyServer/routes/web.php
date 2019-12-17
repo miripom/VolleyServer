@@ -14,6 +14,10 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/api/newMatch/', 'matchesController@addMatch');
+
+
 Route::group([
     'middleware' => 'auth:api'
 ], function() {
@@ -39,5 +43,7 @@ Route::group([
     Route::post('/api/delete', 'ButtonsController@Cancella');
 
 
-    Route::post('/api/newM/{id}', 'matchesController@addMatch');
+
+
+
 });

@@ -57,31 +57,31 @@ class matchesController extends Controller
 
     }
 
-        public function addMatch(Request $request, $id)
+        public function addMatch(Request $request)
         {
             $request->validate([
                 'titolo' => 'required|string',
                 'luogo' => 'required|string',
-                'numero_giocatori' => 'required|string',
+                'giocatori_richiesti' => 'required|string',
                 'descrizione' => 'required|string',
                 'data_ora' => 'required|date',
-                'tipo' => 'required|string',
+                'tipologia' => 'required|string',
                 'organizzatore' => 'string'
             ]);
 
             $match = new Match;
             $match->titolo = $request->titolo;
             $match->luogo = $request->luogo;
-            $match->numero_giocatori = $request->numero_giocatori;
+            $match->numero_giocatori = $request->giocatori_richiesti;
             $match->descrizione = $request->descrizione;
             $match->data_ora = $request->data_ora;
-            $match->tipo = $request->tipo;
-            $match->organizzatore = $request->org;
+            $match->tipo = $request->tipologia;
+            $match->organizzatore = $request->organizzatore;
             $match->save();
 
-            DB::table('users')
+            /*DB::table('users')
                 ->where('id', '=', $id)
-                ->increment('total_matches');
+                ->increment('total_matches');*/
 
             return response()->json([
                 'message' => 'Successfully created!'
