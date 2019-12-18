@@ -15,11 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/api/match_types', 'matchesController@match_type');
-
-Route::group([
-    'middleware' => 'auth:api'
-], function() {
+    Route::get('/api/match_types', 'matchesController@match_type');
 
     Route::post('/api/newMatch', 'matchesController@addMatch');
 
@@ -47,4 +43,4 @@ Route::group([
 
 
 
-});
+

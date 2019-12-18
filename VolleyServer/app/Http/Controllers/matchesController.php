@@ -15,10 +15,10 @@ class matchesController extends Controller
     function match_type(){
 
       $type=  DB::table('match_type')
-            ->select('nome_tipologia')
+          ->select('id', 'nome_tipologia')
             ->get();
 
-            return $type->toArray();
+            return $type->toJson();
     }
 
     function listmatches($idU) {
@@ -75,9 +75,14 @@ class matchesController extends Controller
                 'giocatori_richiesti' => 'required|string',
                 'descrizione' => 'required|string',
                 'data_ora' => 'required|date',
-               // 'tipologia' => 'required|string',
+                'tipologia' => 'required|string',
                 'organizzatore' => 'integer'
             ]);
+
+         $id_tipologia = DB::table('match_type')
+                         ->select('id')
+                         ->where('nome_tipologia', '=', $request->tipologia)
+                        ->value('id');
 
             $match = new Match;
             $match->titolo = $request->titolo;
@@ -85,7 +90,7 @@ class matchesController extends Controller
             $match->numero_giocatori = $request->giocatori_richiesti;
             $match->descrizione = $request->descrizione;
             $match->data_ora = $request->data_ora;
-           // $match->tipo = $request->tipologia;
+            $match->id_tipologia_partita = $id_tipologia;
             $match->id_organizzatore = $request->organizzatore;
             $match->save();
 
