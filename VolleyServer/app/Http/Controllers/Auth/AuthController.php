@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -17,7 +18,6 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
-            //'remember_me' => 'boolean'
         ]);
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials))
@@ -25,18 +25,20 @@ class AuthController extends Controller
                 'message' => 'Unauthorized'
             ], 401);
         $user = $request->user();
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        if ($request->remember_me)
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        $token->save();
+       // $tokenResult = $user->createToken('Personal Access Token');
+      //  $token = $tokenResult->token;
+      //  if ($request->remember_me)
+      //      $token->expires_at = Carbon::now()->addWeeks(1);
+      //  $token->save();
+        $token = Str::random(32);
+        DB::table('users')->where('email', $request->input('email'))->update(['token' => "$token"]);;
         return response(
                 ['nome' => $user->nome,
                 'cognome' => $user->cognome,
                 'id' => $user->id,
 
 
-            ], 200)->withHeaders([ 'token' => $token->id,]);
+            ], 200)->withHeaders([ 'token' => $token]);
     }
 
     public function register(Request $request)

@@ -21,24 +21,41 @@ class matchesController extends Controller
             return $type->toJson();
     }
 
-    function listmatches($idU) {
+    function listmatches(Request $request) {
+
+        $access_token = $request->header('token');
+
+        $idUtente = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
 
         $matches= DB::table('match')
-           ->select('titolo', 'descrizione', 'luogo', 'tipo', 'organizzatore', 'match.id', 'data_ora')
-            ->join('partecipation','match.organizzatore', '=','partecipation.id_giocatore')
-            ->whereNotIn('match.id', function($query) use ($idU){
+           ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'match.id', 'data_ora')
+           //->join('partecipation','match.id_organizzatore', '=','partecipation.id_giocatore')
+           /* ->whereNotIn('match.id', function($query) use ($idUtente){
                 $query->select('id_partita')
                     ->from('partecipation')
-                    ->where('id_giocatore', '=', $idU);
-            })
+                    ->where('id_giocatore', '=', $idUtente);
+            })*/
+           ->where('match.id_organizzatore', '=', $idUtente)
             ->orderByDesc('id')
             ->distinct()
             ->get();
 
-        $result = $matches->map(function ($item, $key) {
-            $item->organizzatore = DB::table('users')
-                ->where('id', '=', $item->organizzatore)
+        $result = $matches->map(function ($items, $key) {
+            $items->id_organizzatore = DB::table('users')
+                ->where('id', '=', $items->id_organizzatore)
                 ->get();
+
+            return $items;
+        });
+
+            $result1 = $matches->map(function ($item, $key) {
+                $item->id_tipologia_partita = DB::table('role_type')
+                    ->where('id', '=', $item->id_tipologia_partita)
+                    ->get();
+
             return $item;
         });
 
@@ -47,17 +64,23 @@ class matchesController extends Controller
         return $matches->toJson();
     }
 
-    function matchDetails($id, $idG)
+    function matchDetails($id, Request $request)
     {
+        $access_token = $request->header('token');
+
+        $idUtente = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
 
         $details = DB::table('match')
-            ->select('titolo', 'descrizione', 'luogo', 'tipo', 'organizzatore', 'id', 'numero_giocatori')
+            ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'id', 'numero_giocatori')
             ->where('id', '=', $id)
             ->get();
 
         $result = DB::table('partecipation')
             ->where('id_partita', '=', $id)
-            ->where('id_giocatore', '=', $idG)
+            ->where('id_giocatore', '=', $idUtente)
             ->count('id');
 
         return response()->json([
@@ -69,6 +92,13 @@ class matchesController extends Controller
 
         public function addMatch(Request $request)
         {
+            $access_token = $request->header('token');
+
+            $idUtente = DB::table('users')
+                ->select('id')
+                ->where('users.token', '=', $access_token)
+                ->value('id');
+
             $request->validate([
                 'titolo' => 'required|string',
                 'luogo' => 'required|string',
@@ -94,9 +124,9 @@ class matchesController extends Controller
             $match->id_organizzatore = $request->organizzatore;
             $match->save();
 
-            /*DB::table('users')
-                ->where('id', '=', $id)
-                ->increment('total_matches');*/
+            DB::table('users')
+                ->where('id', '=', $idUtente)
+                ->increment('partite_totali');
 
             return response()->json([
                 'message' => 'Successfully created!'
@@ -104,7 +134,8 @@ class matchesController extends Controller
         }
 
 
-    public function partecipazione() {
+    public function partecipazioneOrg() {
+
         $partecipa= DB::table('match')
             ->select('id')
             ->orderByDesc('created_at')
@@ -116,10 +147,11 @@ class matchesController extends Controller
             ->orderByDesc('created_at')
             ->first();
 
+
         DB::table('partecipation')
             ->insert([
                 'id_partita'=> $partecipa->id,
-                'id_giocatore' => $utente->organizzatore,
+                'id_giocatore' => $utente->id_organizzatore,
             ]);
 
         return response()->json([

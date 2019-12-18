@@ -21,11 +21,11 @@ Route::get('/', function () {
 
     Route::post('/api/newMatch', 'matchesController@addMatch');
 
-    Route::get('/api/home/{idU}', 'matchesController@listmatches');
+    Route::get('/api/matches', 'matchesController@listmatches');
 
-    Route::get('/api/partecipa', 'matchesController@partecipazione');
+    Route::get('/api/partecipaOrg', 'matchesController@partecipazioneOrg');
 
-    Route::get('/api/matchD/{id}/{idG}', 'matchesController@matchDetails');
+    Route::get('/api/matchD/{id}', 'matchesController@matchDetails');
 
     Route::get('/api/aggiunta/{idG}/{idP}', 'matchesController@partecipa');
 
