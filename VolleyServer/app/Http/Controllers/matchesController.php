@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\DB;
 class matchesController extends Controller
 {
 
+
+    function match_type(){
+
+      $type=  DB::table('match_type')
+            ->select('nome_tipologia')
+            ->get();
+
+            return $type->toArray();
+    }
+
     function listmatches($idU) {
 
         $matches= DB::table('match')

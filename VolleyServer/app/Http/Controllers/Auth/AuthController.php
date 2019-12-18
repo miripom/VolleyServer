@@ -36,7 +36,8 @@ class AuthController extends Controller
                 'id' => $user->id,
 
 
-            ], 200)->withHeaders([ 'Access-Control-Expose-Headers' => 'token','token' => $tokenResult->accessToken]);
+            ], 200)->withHeaders([ 'Access-Control-Expose-Headers' => 'token',
+                                            'token' => $token->id,]);
     }
 
     public function register(Request $request)

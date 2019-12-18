@@ -15,12 +15,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('/api/newMatch/', 'matchesController@addMatch');
-
+Route::get('/api/match_types', 'matchesController@match_type');
 
 Route::group([
     'middleware' => 'auth:api'
 ], function() {
+
+    Route::post('/api/newMatch', 'matchesController@addMatch');
 
     Route::get('/api/home/{idU}', 'matchesController@listmatches');
 
