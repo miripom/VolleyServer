@@ -12,7 +12,7 @@ class matchesController extends Controller
 {
 
 
-    function match_type(){
+    public function match_type(){
 
       $type=  DB::table('match_type')
           ->select('id', 'nome_tipologia')

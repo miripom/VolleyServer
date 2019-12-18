@@ -88,4 +88,12 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+     public function role_type() {
+        $role= DB::table('role_type')
+            ->select('id', 'nome_ruolo')
+            ->get();
+
+        return $role->toJson();
+     }
 }

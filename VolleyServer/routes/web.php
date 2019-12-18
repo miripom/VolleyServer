@@ -17,6 +17,8 @@ Route::get('/', function () {
 
     Route::get('/api/match_types', 'matchesController@match_type');
 
+    Route::get('/api/role_types', 'Auth\AuthController@role_type');
+
     Route::post('/api/newMatch', 'matchesController@addMatch');
 
     Route::get('/api/home/{idU}', 'matchesController@listmatches');
