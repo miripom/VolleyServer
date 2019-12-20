@@ -29,13 +29,13 @@ Route::get('/', function () {
 
     Route::get('/api/aggiunta/{idG}/{idP}', 'matchesController@partecipa');
 
-    Route::get('/api/miepartite/{id}', 'matchesController@my_Matches');
+    Route::get('/api/miepartite', 'matchesController@my_Matches');
 
-    Route::get('/api/terminated/{id}', 'matchesController@partite_terminate');
+    Route::get('/api/terminated', 'matchesController@partite_terminate');
 
     Route::get('/api/players/{id}/{idU}', 'ButtonsController@lasciaFeedback');
 
-    Route::post('/api/updateProfile/{id}', 'ProfileController@updateProfile');
+    Route::post('/api/updateDescription', 'ProfileController@updateDescr');
 
     Route::post('/api/deletePart', 'ButtonsController@removePartecipation');
 

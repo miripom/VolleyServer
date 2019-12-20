@@ -7,18 +7,25 @@ use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
-    public function updateProfile($id, Request $request){
+    public function updateDescr(Request $request){
+
+        $access_token = $request->header('token');
+
+        $idUtente = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
 
 
         DB::table('users')
-            ->where('id', '=', $id)
-            ->update(['users.description'=> $request->input('descr')
+            ->where('id', '=', $idUtente)
+            ->update(['users.descrizione'=> $request->input('descrizione')
 
             ]);
 
         return response()->json([
             'message' => 'Successfully updated!',
-            'data' =>  $request->input('descr')
+            'data' =>  $request->input('descrizione')
         ], 201);
 
     }

@@ -25,17 +25,20 @@ class AuthController extends Controller
                 'message' => 'Unauthorized'
             ], 401);
         $user = $request->user();
-       // $tokenResult = $user->createToken('Personal Access Token');
-      //  $token = $tokenResult->token;
-      //  if ($request->remember_me)
-      //      $token->expires_at = Carbon::now()->addWeeks(1);
-      //  $token->save();
         $token = Str::random(32);
-        DB::table('users')->where('email', $request->input('email'))->update(['token' => "$token"]);;
+        DB::table('users')->where('email', $request->input('email'))->update(['token' => "$token"]);
+
+        $ruolo= DB::table('role_type')
+            ->where('id', '=', $user->id_ruolo)
+            ->get();
+
         return response(
                 ['nome' => $user->nome,
                 'cognome' => $user->cognome,
                 'id' => $user->id,
+                'partite_totali' => $user->partite_totali,
+                'ruolo' => $ruolo[0],
+                'descrizione' => $user->descrizione
 
 
             ], 200)->withHeaders([ 'token' => $token]);
