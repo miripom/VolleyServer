@@ -35,11 +35,7 @@ class matchesController extends Controller
         $matches = DB::table('match')
             ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'match.id', 'data_ora')
             ->join('partecipation', 'match.id_organizzatore', '=', 'partecipation.id_giocatore')
-            ->whereNotIn('match.id', function ($query) use ($idUtente) {
-                $query->select('id_partita')
-                    ->from('partecipation')
-                    ->where('id_giocatore', '=', $idUtente);
-            })
+            ->where('match.data_ora', '>=', Carbon::now())
             ->orderByDesc('id')
             ->distinct()
             ->get();
@@ -102,7 +98,7 @@ class matchesController extends Controller
         $request->validate([
             'titolo' => 'required|string',
             'luogo' => 'required|string',
-            'giocatori_richiesti' => 'required|string',
+            'giocatori_richiesti' => 'required',
             'descrizione' => 'required|string',
             'data_ora' => 'required|date',
             'tipologia' => 'required|string',
@@ -198,19 +194,25 @@ class matchesController extends Controller
         return $partitemie->toJson();
     }
 
-    public function partecipa($idG, $idP)
+    public function partecipa($id, Request $request)
     {
+        $access_token = $request->header('token');
+
+        $idUtente = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
 
         DB::table('partecipation')
             ->insert([
-                'id_giocatore' => $idG,
-                'id_partita' => $idP,
+                'id_giocatore' => $idUtente,
+                'id_partita' => $id,
             ]);
 
         DB::table('match')->decrement('numero_giocatori');
         DB::table('users')
-            ->where('id', '=', $idG)
-            ->increment('total_matches');
+            ->where('id', '=', $idUtente)
+            ->increment('partite_totali');
 
         return response()->json([
             'message' => 'Wow!'
@@ -254,4 +256,23 @@ class matchesController extends Controller
         return $terminate->toJson();
 
     }
+
+    public function allplayers($idpartita) {
+        $players= DB::table('partecipation')
+            ->join('users', 'partecipation.id_giocatore', '=', 'users.id')
+            ->join('role_type', 'users.id_ruolo', '=', 'role_type.id')
+            ->select('users.nome', 'users.cognome', 'role_type.nome_ruolo')
+            ->where('partecipation.id_partita', '=', $idpartita)
+            ->get();
+
+        $players->map(function ($items, $key) {
+            $items->nome_ruolo = DB::table('role_type')
+                ->where('nome_ruolo', '=', $items->nome_ruolo)
+                ->get();
+
+            return $items;
+        });
+
+        return $players->toJson();
+}
 }

@@ -15,31 +15,33 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-    Route::get('/api/match_types', 'matchesController@match_type');
+Route::get('/api/match_types', 'matchesController@match_type');
 
-    Route::get('/api/role_types', 'Auth\AuthController@role_type');
+Route::get('/api/role_types', 'Auth\AuthController@role_type');
 
-    Route::post('/api/newMatch', 'matchesController@addMatch');
+Route::post('/api/newMatch', 'matchesController@addMatch');
 
-    Route::get('/api/matches', 'matchesController@listmatches');
+Route::get('/api/matches', 'matchesController@listmatches');
 
-    Route::get('/api/partecipaOrg', 'matchesController@partecipazioneOrg');
+Route::get('/api/partecipationOrg', 'matchesController@partecipazioneOrg');
 
-    Route::get('/api/matchD/{id}', 'matchesController@matchDetails');
+Route::get('/api/matchD/{id}', 'matchesController@matchDetails');
 
-    Route::get('/api/aggiunta/{idG}/{idP}', 'matchesController@partecipa');
+Route::get('/api/partecipation/{id}', 'matchesController@partecipa');
 
-    Route::get('/api/miepartite', 'matchesController@my_Matches');
+Route::get('/api/mymatches', 'matchesController@my_Matches');
 
-    Route::get('/api/terminated', 'matchesController@partite_terminate');
+Route::get('/api/terminated', 'matchesController@partite_terminate');
 
-    Route::get('/api/players/{id}/{idU}', 'ButtonsController@lasciaFeedback');
+// rotta dei feedback cambiare nome   Route::get('/api/players/{id}/{idU}', 'ButtonsController@lasciaFeedback');
 
-    Route::post('/api/updateDescription', 'ProfileController@updateDescr');
+Route::post('/api/updateDescription', 'ProfileController@updateDescr');
 
-    Route::post('/api/deletePart', 'ButtonsController@removePartecipation');
+Route::get('/api/players/{id}', 'matchesController@allplayers');
 
-    Route::post('/api/delete', 'ButtonsController@Cancella');
+Route::delete('/api/deletePartecipation/{id}', 'ButtonsController@removePartecipation');
+
+Route::delete('/api/deletematch/{id}', 'ButtonsController@Cancella');
 
 
 

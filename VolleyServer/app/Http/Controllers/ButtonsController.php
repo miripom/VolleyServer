@@ -7,21 +7,20 @@ use Illuminate\Support\Facades\DB;
 
 class ButtonsController extends Controller
 {
-    public function Cancella(Request $request) {
+    public function Cancella($id) {
 
-        $idmatch = $request->input('idPartita');
 
         DB::table('users')
-            ->select('total_matches')
-            ->whereIn('id', function($query) use ($idmatch){
+            ->select('partite_totali')
+            ->whereIn('id', function($query) use ($id){
                 $query->select('id_giocatore')
                     ->from('partecipation')
-                    ->where('id_partita', '=', $idmatch);
+                    ->where('id_partita', '=', $id);
             })
-            ->decrement('total_matches');
+            ->decrement('partite_totali');
 
         DB::table('match')
-            ->where('id','=', $idmatch)
+            ->where('id','=', $id)
             ->delete();
 
         return response()->json([
@@ -29,21 +28,27 @@ class ButtonsController extends Controller
         ]);
     }
 
-    public function removePartecipation (Request $request) {
-        $idMatch = $request->input('idP');
-        $idUser = $request->input('idG');
+    public function removePartecipation ($id, Request $request) {
+
+        $access_token = $request->header('token');
+
+        $idUtente = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
+
 
         DB::table('partecipation')
-            ->where('id_partita', '=', $idMatch)
-            ->where('id_giocatore', '=', $idUser)
+            ->where('id_partita', '=', $id)
+            ->where('id_giocatore', '=', $idUtente)
             ->delete();
 
         DB::table('users')
-            ->where('id', '=', $idUser)
-            ->decrement('total_matches');
+            ->where('id', '=', $idUtente)
+            ->decrement('partite_totali');
 
         DB::table('match')
-            ->where('id', '=', $idMatch)
+            ->where('id', '=', $id)
             ->increment('numero_giocatori');
 
         return response()->json([
