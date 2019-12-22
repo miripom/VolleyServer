@@ -12,16 +12,18 @@ class matchesController extends Controller
 {
 
 
-    public function match_type(){
+    public function match_type()
+    {
 
-      $type=  DB::table('match_type')
-          ->select('id', 'nome_tipologia')
+        $type = DB::table('match_type')
+            ->select('id', 'nome_tipologia')
             ->get();
 
-            return $type->toJson();
+        return $type->toJson();
     }
 
-    function listmatches(Request $request) {
+    function listmatches(Request $request)
+    {
 
         $access_token = $request->header('token');
 
@@ -30,10 +32,10 @@ class matchesController extends Controller
             ->where('users.token', '=', $access_token)
             ->value('id');
 
-        $matches= DB::table('match')
-           ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'match.id', 'data_ora')
-           ->join('partecipation','match.id_organizzatore', '=','partecipation.id_giocatore')
-            ->whereNotIn('match.id', function($query) use ($idUtente){
+        $matches = DB::table('match')
+            ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'match.id', 'data_ora')
+            ->join('partecipation', 'match.id_organizzatore', '=', 'partecipation.id_giocatore')
+            ->whereNotIn('match.id', function ($query) use ($idUtente) {
                 $query->select('id_partita')
                     ->from('partecipation')
                     ->where('id_giocatore', '=', $idUtente);
@@ -50,14 +52,13 @@ class matchesController extends Controller
             return $items;
         });
 
-            $result1 = $matches->map(function ($item, $key) {
-                $item->id_tipologia_partita = DB::table('role_type')
-                    ->where('id', '=', $item->id_tipologia_partita)
-                    ->get();
+        $result1 = $matches->map(function ($item, $key) {
+            $item->id_tipologia_partita = DB::table('role_type')
+                ->where('id', '=', $item->id_tipologia_partita)
+                ->get();
 
             return $item;
         });
-
 
 
         return $matches->toJson();
@@ -73,7 +74,7 @@ class matchesController extends Controller
             ->value('id');
 
         $details = DB::table('match')
-            ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'id', 'numero_giocatori')
+            ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'id', 'numero_giocatori', 'data_ora')
             ->where('id', '=', $id)
             ->get();
 
@@ -83,65 +84,66 @@ class matchesController extends Controller
             ->count('id');
 
         return response()->json([
-            'details' =>$details[0],
+            'details' => $details[0],
             'result' => $result
         ], 201);
 
     }
 
-        public function addMatch(Request $request)
-        {
-            $access_token = $request->header('token');
+    public function addMatch(Request $request)
+    {
+        $access_token = $request->header('token');
 
-            $idUtente = DB::table('users')
-                ->select('id')
-                ->where('users.token', '=', $access_token)
-                ->value('id');
+        $idUtente = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
 
-            $request->validate([
-                'titolo' => 'required|string',
-                'luogo' => 'required|string',
-                'giocatori_richiesti' => 'required|string',
-                'descrizione' => 'required|string',
-                'data_ora' => 'required|date',
-                'tipologia' => 'required|string',
-                'organizzatore' => 'integer'
-            ]);
+        $request->validate([
+            'titolo' => 'required|string',
+            'luogo' => 'required|string',
+            'giocatori_richiesti' => 'required|string',
+            'descrizione' => 'required|string',
+            'data_ora' => 'required|date',
+            'tipologia' => 'required|string',
+            'organizzatore' => 'integer'
+        ]);
 
-         $id_tipologia = DB::table('match_type')
-                         ->select('id')
-                         ->where('nome_tipologia', '=', $request->tipologia)
-                        ->value('id');
+        $id_tipologia = DB::table('match_type')
+            ->select('id')
+            ->where('nome_tipologia', '=', $request->tipologia)
+            ->value('id');
 
-            $match = new Match;
-            $match->titolo = $request->titolo;
-            $match->luogo = $request->luogo;
-            $match->numero_giocatori = $request->giocatori_richiesti;
-            $match->descrizione = $request->descrizione;
-            $match->data_ora = $request->data_ora;
-            $match->id_tipologia_partita = $id_tipologia;
-            $match->id_organizzatore = $request->organizzatore;
-            $match->save();
+        $match = new Match;
+        $match->titolo = $request->titolo;
+        $match->luogo = $request->luogo;
+        $match->numero_giocatori = $request->giocatori_richiesti;
+        $match->descrizione = $request->descrizione;
+        $match->data_ora = $request->data_ora;
+        $match->id_tipologia_partita = $id_tipologia;
+        $match->id_organizzatore = $request->organizzatore;
+        $match->save();
 
-            DB::table('users')
-                ->where('id', '=', $idUtente)
-                ->increment('partite_totali');
+        DB::table('users')
+            ->where('id', '=', $idUtente)
+            ->increment('partite_totali');
 
-            return response()->json([
-                'message' => 'Successfully created!'
-            ], 201);
-        }
+        return response()->json([
+            'message' => 'Successfully created!'
+        ], 201);
+    }
 
 
-    public function partecipazioneOrg() {
+    public function partecipazioneOrg()
+    {
 
-        $partecipa= DB::table('match')
+        $partecipa = DB::table('match')
             ->select('id')
             ->orderByDesc('created_at')
             ->first();
 
 
-        $utente= DB::table('match')
+        $utente = DB::table('match')
             ->select('id_organizzatore')
             ->orderByDesc('created_at')
             ->first();
@@ -149,7 +151,7 @@ class matchesController extends Controller
 
         DB::table('partecipation')
             ->insert([
-                'id_partita'=> $partecipa->id,
+                'id_partita' => $partecipa->id,
                 'id_giocatore' => $utente->id_organizzatore,
             ]);
 
@@ -158,7 +160,8 @@ class matchesController extends Controller
         ], 201);
 
 
-}
+    }
+
     public function my_Matches(Request $request)
     {
         $access_token = $request->header('token');
@@ -195,17 +198,18 @@ class matchesController extends Controller
         return $partitemie->toJson();
     }
 
-    public function partecipa($idG,$idP) {
+    public function partecipa($idG, $idP)
+    {
 
         DB::table('partecipation')
             ->insert([
                 'id_giocatore' => $idG,
-                'id_partita'=> $idP,
+                'id_partita' => $idP,
             ]);
 
         DB::table('match')->decrement('numero_giocatori');
         DB::table('users')
-            ->where('id',  '=', $idG)
+            ->where('id', '=', $idG)
             ->increment('total_matches');
 
         return response()->json([
@@ -213,39 +217,41 @@ class matchesController extends Controller
         ], 201);
 
     }
-public function partite_terminate(Request $request) {
-    $access_token = $request->header('token');
 
-    $idUtente = DB::table('users')
-        ->select('id')
-        ->where('users.token', '=', $access_token)
-        ->value('id');
+    public function partite_terminate(Request $request)
+    {
+        $access_token = $request->header('token');
 
-    $terminate = DB::table('match')
-        ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'match.id', 'data_ora')
-        ->join('partecipation', 'match.id', '=', 'partecipation.id_partita')
-        ->where('partecipation.id_giocatore', '=', $idUtente)
-        ->where('match.data_ora','<', Carbon::now())
-        ->orderByDesc('match.id')
-        ->distinct()
-        ->get();
+        $idUtente = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
 
-         $terminate->map(function ($item, $key) {
-        $item->id_organizzatore = DB::table('users')
-            ->where('id', '=', $item->id_organizzatore)
+        $terminate = DB::table('match')
+            ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'match.id', 'data_ora')
+            ->join('partecipation', 'match.id', '=', 'partecipation.id_partita')
+            ->where('partecipation.id_giocatore', '=', $idUtente)
+            ->where('match.data_ora', '<', Carbon::now())
+            ->orderByDesc('match.id')
+            ->distinct()
             ->get();
-        return $item;
-    });
 
         $terminate->map(function ($item, $key) {
-        $item->id_tipologia_partita = DB::table('role_type')
-            ->where('id', '=', $item->id_tipologia_partita)
-            ->get();
+            $item->id_organizzatore = DB::table('users')
+                ->where('id', '=', $item->id_organizzatore)
+                ->get();
+            return $item;
+        });
 
-        return $item;
-    });
+        $terminate->map(function ($item, $key) {
+            $item->id_tipologia_partita = DB::table('role_type')
+                ->where('id', '=', $item->id_tipologia_partita)
+                ->get();
 
-    return $terminate->toJson();
+            return $item;
+        });
 
-}
+        return $terminate->toJson();
+
+    }
 }
