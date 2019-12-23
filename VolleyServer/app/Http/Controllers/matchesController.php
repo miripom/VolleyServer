@@ -43,7 +43,7 @@ class matchesController extends Controller
         $result = $matches->map(function ($items, $key) {
             $items->id_organizzatore = DB::table('users')
                 ->where('id', '=', $items->id_organizzatore)
-                ->get();
+                ->first();
 
             return $items;
         });
@@ -51,7 +51,7 @@ class matchesController extends Controller
         $result1 = $matches->map(function ($item, $key) {
             $item->id_tipologia_partita = DB::table('role_type')
                 ->where('id', '=', $item->id_tipologia_partita)
-                ->get();
+                ->first();
 
             return $item;
         });
@@ -179,14 +179,14 @@ class matchesController extends Controller
         $partitemie->map(function ($item, $key) {
             $item->id_organizzatore = DB::table('users')
                 ->where('id', '=', $item->id_organizzatore)
-                ->get();
+                ->first();
             return $item;
         });
 
         $partitemie->map(function ($item, $key) {
             $item->id_tipologia_partita = DB::table('role_type')
                 ->where('id', '=', $item->id_tipologia_partita)
-                ->get();
+                ->first();
 
             return $item;
         });
@@ -241,14 +241,14 @@ class matchesController extends Controller
         $terminate->map(function ($item, $key) {
             $item->id_organizzatore = DB::table('users')
                 ->where('id', '=', $item->id_organizzatore)
-                ->get();
+                ->first();
             return $item;
         });
 
         $terminate->map(function ($item, $key) {
             $item->id_tipologia_partita = DB::table('role_type')
                 ->where('id', '=', $item->id_tipologia_partita)
-                ->get();
+                ->first();
 
             return $item;
         });
@@ -261,14 +261,15 @@ class matchesController extends Controller
         $players= DB::table('partecipation')
             ->join('users', 'partecipation.id_giocatore', '=', 'users.id')
             ->join('role_type', 'users.id_ruolo', '=', 'role_type.id')
-            ->select('users.nome', 'users.cognome', 'role_type.nome_ruolo')
+            ->select('users.nome', 'users.cognome', 'users.id_ruolo')
             ->where('partecipation.id_partita', '=', $idpartita)
             ->get();
 
         $players->map(function ($items, $key) {
-            $items->nome_ruolo = DB::table('role_type')
-                ->where('nome_ruolo', '=', $items->nome_ruolo)
-                ->get();
+            $items->id_ruolo = DB::table('role_type')
+                ->select('nome_ruolo')
+                ->where('id', '=', $items->id_ruolo)
+                ->first();
 
             return $items;
         });
