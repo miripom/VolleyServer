@@ -27,6 +27,9 @@ class feedbackController extends Controller
             ->where('id', '=', $request->idGiocatore)
             ->value('id');
 
+        $totaleVoti = DB::table('feedback')
+            ->where('id_giocatore_votato', '=', $id_giocatore_votato)
+            ->count('id_giocatore_votato');
 
 
         $feedback = new Feedback();
@@ -34,6 +37,9 @@ class feedbackController extends Controller
         $feedback->id_giocatore_votato = $id_giocatore_votato;
         $feedback->voto = $request->voto;
         $feedback->save();
+
+
+
 
 
         return response()->json([
