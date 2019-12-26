@@ -262,12 +262,13 @@ class matchesController extends Controller
 
     }
 
-    public function allplayers($idpartita) {
+    public function allplayers($id) {
         $players= DB::table('partecipation')
             ->join('users', 'partecipation.id_giocatore', '=', 'users.id')
             ->join('role_type', 'users.id_ruolo', '=', 'role_type.id')
             ->select('users.nome', 'users.cognome', 'users.id_ruolo')
-            ->where('partecipation.id_partita', '=', $idpartita)
+            ->where('partecipation.id_partita', '=', $id)
+            ->distinct()
             ->get();
 
         $players->map(function ($items, $key) {
@@ -281,4 +282,38 @@ class matchesController extends Controller
 
         return $players->toJson();
 }
+
+
+
+    public function feedbackPlayers(Request $request, $idpartita) {
+
+        $access_token = $request->header('token');
+
+        $idUtente = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
+
+        $players= DB::table('partecipation')
+            ->join('users', 'partecipation.id_giocatore', '=', 'users.id')
+            ->join('role_type', 'users.id_ruolo', '=', 'role_type.id')
+            ->select('users.nome', 'users.cognome', 'users.id_ruolo', 'users.id')
+            ->where('partecipation.id_partita', '=', $idpartita)
+            ->where('partecipation.id_giocatore', '<>', $idUtente)
+            ->distinct()
+            ->get();
+
+        $players->map(function ($items, $key) {
+            $items->id_ruolo = DB::table('role_type')
+                ->select('nome_ruolo')
+                ->where('id', '=', $items->id_ruolo)
+                ->first();
+
+            return $items;
+        });
+
+        return $players->toJson();
+    }
+
+
 }

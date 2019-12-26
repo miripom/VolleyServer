@@ -45,6 +45,10 @@ Route::delete('/api/deletePartecipation/{id}', 'ButtonsController@removePartecip
 
 Route::delete('/api/deletematch/{id}', 'ButtonsController@Cancella');
 
+Route::get('api/feedbackP/{id}', 'matchesController@feedbackPlayers');
+
+Route::post('api/votazione', 'feedbackController@addVoto');
+
 
 
 
