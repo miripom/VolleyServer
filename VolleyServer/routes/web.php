@@ -39,6 +39,8 @@ Route::post('/api/updateDescription', 'ProfileController@updateDescr');
 
 Route::get('/api/players/{id}', 'matchesController@allplayers');
 
+Route::get('/api/checkPartecipation/{id}', 'matchesController@checkP');
+
 Route::delete('/api/deletePartecipation/{id}', 'ButtonsController@removePartecipation');
 
 Route::delete('/api/deletematch/{id}', 'ButtonsController@Cancella');

@@ -22,15 +22,8 @@ class matchesController extends Controller
         return $type->toJson();
     }
 
-    function listmatches(Request $request)
+    function listmatches()
     {
-
-        $access_token = $request->header('token');
-
-        $idUtente = DB::table('users')
-            ->select('id')
-            ->where('users.token', '=', $access_token)
-            ->value('id');
 
         $matches = DB::table('match')
             ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'match.id', 'data_ora')
@@ -60,8 +53,29 @@ class matchesController extends Controller
         return $matches->toJson();
     }
 
-    function matchDetails($id, Request $request)
+    function matchDetails($id)
     {
+
+        $details = DB::table('match')
+            ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'id', 'numero_giocatori', 'data_ora')
+            ->where('id', '=', $id)
+            ->distinct()
+            ->get();
+
+        $details->map(function ($item, $key) {
+            $item->id_organizzatore = DB::table('users')
+                ->select('id')
+                ->where('id', '=', $item->id_organizzatore)
+                ->first();
+            return $item;
+        });
+
+
+    return $details->toJson();
+
+    }
+
+    public function checkP(Request $request, $id){
         $access_token = $request->header('token');
 
         $idUtente = DB::table('users')
@@ -69,21 +83,12 @@ class matchesController extends Controller
             ->where('users.token', '=', $access_token)
             ->value('id');
 
-        $details = DB::table('match')
-            ->select('titolo', 'descrizione', 'luogo', 'id_tipologia_partita', 'id_organizzatore', 'id', 'numero_giocatori', 'data_ora')
-            ->where('id', '=', $id)
-            ->get();
-
         $result = DB::table('partecipation')
             ->where('id_partita', '=', $id)
             ->where('id_giocatore', '=', $idUtente)
             ->count('id');
 
-        return response()->json([
-            'details' => $details[0],
-            'result' => $result
-        ], 201);
-
+        return $result;
     }
 
     public function addMatch(Request $request)
