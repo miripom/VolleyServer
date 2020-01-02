@@ -16,6 +16,7 @@ class CreateFeedbackTable extends Migration
         Schema::create('feedback', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('id_giocatore_votante');
+            $table->unsignedBigInteger('id_partita');
             $table->unsignedBigInteger('id_giocatore_votato');
             $table->string('commento')->nullable();
             $table->enum('voto', ['1','2','3','4','5']);
@@ -23,6 +24,8 @@ class CreateFeedbackTable extends Migration
 
             $table->foreign('id_giocatore_votante')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('id_giocatore_votato')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('id_partita')->references('id')->on('match')->onDelete('cascade');
+
 
         });
     }
