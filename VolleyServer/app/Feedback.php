@@ -13,5 +13,6 @@ class Feedback extends Model
         'id_giocatore_votato',
         'commento',
         'voto',
+        'id_partita'
     ];
 }

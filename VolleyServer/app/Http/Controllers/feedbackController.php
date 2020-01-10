@@ -12,12 +12,6 @@ class feedbackController extends Controller
     {
         $access_token = $request->header('token');
 
-        $request->validate([
-            'id_giocatore_votato' => 'required|string',
-            'voto' => 'required|string',
-            'commento' => 'string'
-        ]);
-
         $id_giocatore_votante = DB::table('users')
             ->select('id')
             ->where('users.token', '=', $access_token)
@@ -29,12 +23,27 @@ class feedbackController extends Controller
             ->value('id');
 
 
-        $feedback = new Feedback();
+
+
+        DB::table('feedback')
+            ->insert([
+                'id_giocatore_votato' => $request->input('id_giocatore_votato'),
+                'id_giocatore_votante' => $id_giocatore_votante,
+                'id_partita' => $request->input('id_partita'),
+                'commento' =>$request->input('commento'),
+                'voto' =>$request->input('voto')
+            ]);
+
+
+
+
+        /*$feedback = new Feedback();
         $feedback->id_giocatore_votante = $id_giocatore_votante;
         $feedback->id_giocatore_votato = $id_giocatore_votato;
         $feedback->voto = $request->input('voto');
         $feedback->commento = $request->input('commento');
-        $feedback->save();
+        $feedback->id_partita = $request->input('id_partita');
+        $feedback->save();*/
 
         return response()->json([
             'message' => 'Successfully created!'
