@@ -37,7 +37,7 @@ class AuthController extends Controller
                 'cognome' => $user->cognome,
                 'id' => $user->id,
                 'partite_totali' => $user->partite_totali,
-                'ruolo' => $ruolo[0],
+                'id_ruolo' => $ruolo[0],
                 'descrizione' => $user->descrizione
 
 

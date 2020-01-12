@@ -52,6 +52,22 @@ class feedbackController extends Controller
 
     }
 
+    public function getMedia(Request $request){
+        $access_token = $request->header('token');
+
+        $id= DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
+
+        $results =DB::table('feedback')
+                ->where('id_giocatore_votato', '=', $id)
+                ->avg('voto');
+
+
+        return $results;
+    }
+
     public function getCommenti(Request $request){
 
         $access_token = $request->header('token');

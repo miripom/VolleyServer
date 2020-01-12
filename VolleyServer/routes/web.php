@@ -53,6 +53,8 @@ Route::post('api/checkFeedback', 'feedbackController@checkFeedback');
 
 Route::get('api/commenti', 'feedbackController@getCommenti');
 
+Route::get('api/media', 'feedbackController@getMedia');
+
 
 
 
