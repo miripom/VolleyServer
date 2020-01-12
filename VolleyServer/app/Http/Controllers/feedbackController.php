@@ -17,13 +17,6 @@ class feedbackController extends Controller
             ->where('users.token', '=', $access_token)
             ->value('id');
 
-        $id_giocatore_votato = DB::table('users')
-            ->select('id')
-            ->where('id', '=', $request->input('id_giocatore_votato'))
-            ->value('id');
-
-
-
 
         DB::table('feedback')
             ->insert([
@@ -35,18 +28,59 @@ class feedbackController extends Controller
             ]);
 
 
-
-
-        /*$feedback = new Feedback();
-        $feedback->id_giocatore_votante = $id_giocatore_votante;
-        $feedback->id_giocatore_votato = $id_giocatore_votato;
-        $feedback->voto = $request->input('voto');
-        $feedback->commento = $request->input('commento');
-        $feedback->id_partita = $request->input('id_partita');
-        $feedback->save();*/
-
         return response()->json([
             'message' => 'Successfully created!'
         ], 201);
     }
+
+    public function checkFeedback(Request $request){
+        $access_token = $request->header('token');
+
+        $id_giocatore_votante = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
+
+        $check = DB::table('feedback')
+            ->select('commento', 'voto')
+            ->where('id_giocatore_votante', '=', $id_giocatore_votante)
+            ->where('id_giocatore_votato', '=', $request->input('id_giocatore'))
+            ->where('id_partita', '=', $request->input('id_partita'))
+            ->get();
+
+        return $check->toJson();
+
+    }
+
+    public function getCommenti(Request $request){
+
+        $access_token = $request->header('token');
+
+        $id = DB::table('users')
+            ->select('id')
+            ->where('users.token', '=', $access_token)
+            ->value('id');
+
+        $commenti = DB::table('feedback')
+            ->join('users', 'feedback.id_giocatore_votato', '=', 'users.id')
+            ->select('feedback.commento', 'feedback.voto', 'feedback.id_giocatore_votante AS utente_id', 'feedback.id')
+            ->where('feedback.id_giocatore_votato','=', $id)
+            ->orderByDesc('feedback.id')
+            ->distinct()
+            ->get();
+
+        $commenti->map(function ($item, $key) {
+            $item->id_giocatore_votante= DB::table('users')
+                ->where('id', '=', $item->utente_id)
+                ->select('users.nome', 'users.cognome')
+                ->distinct()
+                ->first();
+
+            return $item;
+        });
+
+        return $commenti->toJson();
+    }
+
+
 }

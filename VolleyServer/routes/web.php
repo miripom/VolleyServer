@@ -49,6 +49,10 @@ Route::get('api/feedbackP/{id}', 'matchesController@feedbackPlayers');
 
 Route::post('api/votazione', 'feedbackController@addVoto');
 
+Route::post('api/checkFeedback', 'feedbackController@checkFeedback');
+
+Route::get('api/commenti', 'feedbackController@getCommenti');
+
 
 
 

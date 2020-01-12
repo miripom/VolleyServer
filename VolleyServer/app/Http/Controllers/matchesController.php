@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Match;
 use Carbon\Carbon;
-use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +32,7 @@ class matchesController extends Controller
             ->distinct()
             ->get();
 
-        $result = $matches->map(function ($items, $key) {
+       $matches->map(function ($items, $key) {
             $items->id_organizzatore = DB::table('users')
                 ->where('id', '=', $items->id_organizzatore)
                 ->first();
@@ -41,7 +40,7 @@ class matchesController extends Controller
             return $items;
         });
 
-        $result1 = $matches->map(function ($item, $key) {
+       $matches->map(function ($item, $key) {
             $item->id_tipologia_partita = DB::table('role_type')
                 ->where('id', '=', $item->id_tipologia_partita)
                 ->first();
