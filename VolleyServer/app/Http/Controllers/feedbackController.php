@@ -41,14 +41,23 @@ class feedbackController extends Controller
             ->where('users.token', '=', $access_token)
             ->value('id');
 
-        $check = DB::table('feedback')
+        $feedback = DB::table('feedback')
             ->select('commento', 'voto')
             ->where('id_giocatore_votante', '=', $id_giocatore_votante)
             ->where('id_giocatore_votato', '=', $request->input('id_giocatore'))
             ->where('id_partita', '=', $request->input('id_partita'))
             ->get();
 
-        return $check->toJson();
+        $check = DB::table('feedback')
+            ->where('id_partita', '=', $request->input('id_partita'))
+            ->where('id_giocatore_votato', '=', $request->input('id_giocatore'))
+            ->where('id_giocatore_votante', '=', $id_giocatore_votante)
+            ->count('id');
+
+        return response()->json([
+            'feedback' => $feedback,
+            'check' => $check
+        ]);
 
     }
 
